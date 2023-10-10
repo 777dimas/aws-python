@@ -30,7 +30,7 @@ def main():
         }
     )
 
-    TagKey = 'Name'
+    TagKey = TagKey_var
     TagValue = TagValue_var
 
 
