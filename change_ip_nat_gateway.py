@@ -1,7 +1,4 @@
-import ipaddress
-
 import boto3
-import ipaddress
 from botocore.config import Config
 
 from vars import *
@@ -19,12 +16,6 @@ def wait_for_release(client, eip):
                     public_ip = address.get('PublicIp')
                     if public_ip == eip['PublicIp']:
                         found = True
-
-def get_free_ip_on_subnet():
-    subnet_id = subnet-017e874c922279fdf
-    cidr = get_cidr(subnet_id)
-    cidr_ips = [str(ip) for ip in ipaddress.IPv4Network(cidr)]
-    cidr_ips.sort(key=ipaddress.IPv4Address)
 
 def main():
     my_config = Config(
