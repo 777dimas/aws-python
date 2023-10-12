@@ -18,7 +18,6 @@ def wait_for_release(client, eip):
                     public_ip = address.get('PublicIp')
                     if public_ip == eip['PublicIp']:
                         found = True
-        time.sleep(10)
 
 def main():
     my_config = Config(
@@ -56,12 +55,12 @@ def main():
                             AssociationIds=[address.get('AssociationId')],
                             MaxDrainDurationSeconds=5,
                             )
-                        wait_for_release(client, eip)
-                        response = client.release_address(
-                        AllocationId=eip['AllocationId'],
-                        )
-                        if 'ResponseMetadata' not in response:
-                            raise Exception(f'Bad response {response}')
+                            wait_for_release(client, eip)
+                            response = client.release_address(
+                            AllocationId=eip['AllocationId'],
+                            )
+                            if 'ResponseMetadata' not in response:
+                                raise Exception(f'Bad response {response}')
 
 
     eip = client.allocate_address(Domain='vpc')
