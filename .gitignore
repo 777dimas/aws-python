@@ -1,2 +1,4 @@
 __pycache__/
 .vscode
+vars.py
+.create_vpc_peering_connection/test.py
