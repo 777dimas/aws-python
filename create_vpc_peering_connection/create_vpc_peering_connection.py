@@ -10,15 +10,21 @@ def create_route_tables_in_requester_vpc(client):
 
     nat_gateway = NatGatewayId
 
+    if 'RouteTable' not in response:
+        raise Exception(f"Bad response {response}")
     response = client.create_route_table(VpcId=requester_vpc_id)
     route_table_id = response['RouteTable']['RouteTableId']
 
+    if 'ResponseMetadata' not in response:
+        raise Exception(f'Bad response {response}')
     client.create_route(
         RouteTableId=route_table_id,
         DestinationCidrBlock='172.20.0.0/16',
         VpcPeeringConnectionId=response['VpcPeeringConnection']['VpcPeeringConnectionId']
     )
 
+    if 'ResponseMetadata' not in response:
+        raise Exception(f'Bad response {response}')
     client.create_route(
         RouteTableId=route_table_id,
         DestinationCidrBlock='0.0.0.0/0',
@@ -29,9 +35,13 @@ def create_route_tables_in_requester_vpc(client):
     return result_msg
 
 def create_route_tables_in_accepter_vpc_vpc(client):
+    if 'RouteTable' not in response:
+        raise Exception(f" Bad response {response}")
     response = client.create_route_table(VpcId=accepter_vpc_id)
     route_table_id = response['RouteTable']['RouteTableId']
 
+    if 'ResponseMetadata' not in response:
+        raise Exception(f'Bad response {response}')
     client.create_route(
         RouteTableId=route_table_id,
         DestinationCidrBlock='10.0.0.0/16',
@@ -57,6 +67,8 @@ def main():
 
     client = boto3.client('ec2', config=my_config)
 
+    if 'VpcPeeringConnection' not in response:
+        raise Exception(f'Bad response {response}')
     response = client.create_vpc_peering_connection(
         PeerOwnerId=account_id,
         PeerVpcId=accepter_vpc_id,
