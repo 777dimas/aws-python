@@ -5,8 +5,6 @@ from vars import *
 
 accepter_vpc_id = PeerVpcId
 requester_vpc_id = VpcId
-tag_key = TagKey
-tag_value = TagValue
 
 def create_route_tables_in_requester_vpc(client):
 
@@ -54,6 +52,8 @@ def main():
     )
 
     account_id = PeerOwnerId
+    tag_key = TagKey
+    tag_value = TagValue
 
     client = boto3.client('ec2', config=my_config)
 
