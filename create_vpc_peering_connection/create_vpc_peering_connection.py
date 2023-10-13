@@ -3,6 +3,46 @@ from botocore.config import Config
 
 from vars import *
 
+accepter_vpc_id = PeerVpcId
+requester_vpc_id = VpcId
+tag_key = TagKey
+tag_value = TagValue
+
+def create_route_tables_in_requester_vpc(client):
+
+    nat_gateway = NatGatewayId
+
+    response = client.create_route_table(VpcId=requester_vpc_id)
+    route_table_id = response['RouteTable']['RouteTableId']
+
+    client.create_route(
+        RouteTableId=route_table_id,
+        DestinationCidrBlock='172.20.0.0/16',
+        VpcPeeringConnectionId=response['VpcPeeringConnection']['VpcPeeringConnectionId']
+    )
+
+    client.create_route(
+        RouteTableId=route_table_id,
+        DestinationCidrBlock='0.0.0.0/0',
+        NatGatewayId=nat_gateway
+    )
+
+    result_msg = f'Route table {route_table_id} created with routes in requester vpc'
+    return result_msg
+
+def create_route_tables_in_accepter_vpc_vpc(client):
+    response = client.create_route_table(VpcId=accepter_vpc_id)
+    route_table_id = response['RouteTable']['RouteTableId']
+
+    client.create_route(
+        RouteTableId=route_table_id,
+        DestinationCidrBlock='10.0.0.0/16',
+        VpcPeeringConnectionId=response['VpcPeeringConnection']['VpcPeeringConnectionId']
+    )
+
+    result_msg = f'Route table {route_table_id} created with routes in accepter vpc'
+    return result_msg
+
 def main():
     my_config = Config(
         region_name = 'eu-central-1',
@@ -14,10 +54,6 @@ def main():
     )
 
     account_id = PeerOwnerId
-    accepter_vpc_id = PeerVpcId
-    requester_vpc_id = VpcId
-    tag_key = TagKey
-    tag_value = TagValue
 
     client = boto3.client('ec2', config=my_config)
 
@@ -38,12 +74,15 @@ def main():
         ]
     )
 
-    print(response['VpcPeeringConnection']['VpcPeeringConnectionId'])
+    peering_connection_id = response['VpcPeeringConnection']['VpcPeeringConnectionId']
+    print(f'Peering connections {peering_connection_id} created')
 
     accept_connection = client.accept_vpc_peering_connection(
-    VpcPeeringConnectionId=response['VpcPeeringConnection']['VpcPeeringConnectionId']
+    VpcPeeringConnectionId=peering_connection_id
     )
-    #print(accept_connection)
+    print(f"Status peering connection is: {accept_connection['Status']}")
+    print(create_route_tables_in_requester_vpc(client))
+    print(create_route_tables_in_accepter_vpc_vpc(client))
 
 if __name__ == "__main__":
     main()
